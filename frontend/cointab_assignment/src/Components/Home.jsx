@@ -9,7 +9,7 @@ function Home() {
 
   const getAllUsers = async () => {
     try {
-      const response = await axios.get('https://long-deer-petticoat.cyclic.app/users');
+      const response = await axios.get('https://cointable-backend-1.onrender.com/users');
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users: ', error);

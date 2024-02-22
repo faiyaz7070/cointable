@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:6500'
+  baseURL: 'https://cointable-backend-1.onrender.com/'
 });
 
 export const getAllUsers = () => api.get('/users');

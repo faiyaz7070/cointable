@@ -9,7 +9,7 @@ function Post({ userId }) {
   console.log(posts);
   const getPostsByUserId = async () => {
     try {
-      const response = await axios.get(`https://long-deer-petticoat.cyclic.app/posts/${id.id}`);
+      const response = await axios.get(`https://cointable-backend-1.onrender.com/posts/${id.id}`);
       setPosts(response.data);
     } catch (error) {
       console.error('Error fetching posts: ', error);
