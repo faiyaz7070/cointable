@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>User Information</h1>
+    <p>Name: <span id="user_name"></span></p>
+    <p>Email: <span id="user_email"></span></p>
+    <p>Phone: <span id="user_phone"></span></p>
+    <p>Website: <span id="user_website"></span></p>
+    <p>City: <span id="user_city"></span></p>
+    <p>Company: <span id="user_company"></span></p>
+
+    <!-- Buttons for Bulk Add and Download in Excel -->
+    <button id="bulk-add-button" onclick="bulkAddPosts()">Bulk Add</button>
+    <button id="download-excel-button" onclick="downloadExcel()" style="display: none">Download In Excel</button>
+  </div>
+
+  <script>
+    async function fetchUserData(userId) {
+      try {
+        const response = await fetch(`http://localhost:4500/users/${userId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+        const userData = await response.json();
+
+        document.getElementById("user_name").textContent = userData.name;
+        document.getElementById("user_email").textContent = userData.email;
+        document.getElementById("user_phone").textContent = userData.phone;
+        document.getElementById("user_website").textContent = userData.website;
+        document.getElementById("user_city").textContent = userData.address.city;
+        document.getElementById("user_company").textContent = userData.company.name;
+      } catch (error) {
+        console.error("Error:", error.message);
+      }
+    }
+
+    async function bulkAddPosts() {
+      try {
+        const userId = idGetFunction();
+
+        const postData = {
+          userId: userId,
+          // Additional post data can be gathered here if needed
+        };
+
+        const response = await fetch(`http://localhost:4500/posts/${userId}/bulkAdd`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postData),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to add posts");
+        }
+
+        document.getElementById("bulk-add-button").style.display = "none";
+        document.getElementById("download-excel-button").style.display = "block";
+      } catch (error) {
+        console.error("Error:", error.message);
+      }
+    }
+
+    async function downloadExcel() {
+      try {
+        const userId = idGetFunction();
+
+        const response = await fetch(`http://localhost:4500/posts/${userId}/downloadExcel`);
+
+        if (!response.ok) {
+          throw new Error("Failed to download Excel file");
+        }
+
+        const fileBlob = await response.blob();
+        const fileUrl = URL.createObjectURL(fileBlob);
+
+        const downloadLink = document.createElement("a");
+        downloadLink.href = fileUrl;
+        downloadLink.download = "posts.xlsx";
+        downloadLink.click();
+
+        URL.revokeObjectURL(fileUrl);
+      } catch (error) {
+        console.error("Error:", error.message);
+      }
+    }
+
+    function idGetFunction() {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      return urlParams.get("userId");
+    }
+
+    window.addEventListener("load", () => {
+      const userId = idGetFunction();
+      fetchUserData(userId);
+    });
+  </script>
+</body>
+</html>
